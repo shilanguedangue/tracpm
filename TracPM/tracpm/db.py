@@ -105,27 +105,26 @@ ADD these tables
         Index(['update_ts'])                      
     ],                                               
 '''
-
+'''
 def to_sql(env, table):
-    """ Convenience function to get the to_sql for the active connector."""
+    # Convenience function to get the to_sql for the active connector.
     from trac.db.api import DatabaseManager
     dc = DatabaseManager(env)._get_connector()[0]
     return dc.to_sql(table)
 
 def create_tables(env, db):
-    """ Creates the basic tables as defined by schema.
-    using the active database connector. """
+    Creates the basic tables as defined by schema. using the active database connector.
     cursor = db.cursor()
     for table in schema:
         for stmt in to_sql(env, table):
             cursor.execute(stmt)
-    cursor.execute("INSERT into system values ('sqa_version', %s)",
+    cursor.execute("INSERT into system values ('pm_version', %s)",
                         str(db_version))
-    cursor.execute("INSERT into system values ('sqa_infotext', '')")
+    cursor.execute("INSERT into system values ('pm_infotext', '')")
 
 # Upgrades
 def add_timeline_time_indexes(env, db):
-    """ Add time-based indexes to blog post and comment tables. """
+    #Add time-based indexes to blog post and comment tables. 
     cursor = db.cursor()
     cursor.execute(
         "CREATE INDEX test_mgr_update_idx ON test_mgr (update_ts)")
@@ -143,9 +142,9 @@ upgrade_map = {
         2: add_timeline_time_indexes
 }
 
+'''
 
 
-# Component that deals with database setup
 
 
 class PMSetup(Component):

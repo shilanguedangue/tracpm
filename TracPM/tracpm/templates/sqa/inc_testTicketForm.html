@@ -1,0 +1,254 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:py="http://genshi.edgewall.org/">
+<!-- ! Render the ticket field form based on ticket items defined in trac system -->
+
+<!--! List existing tickets -->
+
+<head>
+	
+	<py:if test="chrome.links">
+      <py:for each="rel, links in chrome.links.items()">
+        <link rel="${rel}" py:for="link in links" py:attrs="link" />
+      </py:for>
+    </py:if>
+	
+	<script>
+
+	$("input[name='ajax_button']").click(function() {  
+		/*
+		 * Get the id of the form containing the button clicked
+		 */
+		formName = $(this).parents('form:first').attr("id");
+		/*
+		 * Get the serialized content of this form 
+		 */
+		formData = $('#'+formName).serialize()
+		
+		// Debug message
+		//alert("Clicked Button FormName[ " +formName+ " ]\nData - " + formData);
+		/*
+		 * Steps to complete defect recording
+		 * 1.) Submit data via ajax
+		 * 1.1) Get result back and add to list of tickets open against this step 
+		 * 2.) Disable radio button selections 
+		 * 3.) Ask if the user would like to continue testing. 
+		 * 
+		 */
+		$.ajax({
+			type: "POST",
+				url: "ajax",
+				data: formData,
+				cache: false,
+				success: function(html){
+					
+					//result = jQuery.parsejson(json);
+					alert("Ticket Created " + html);
+				}
+		});
+	});
+	
+
+	</script>
+	
+</head>
+
+
+<div>
+<div id="ticketList" >
+	<fieldset>
+		<legend>Open Tickets</legend>
+		<div id="tabs">
+			<ul>
+				<li py:for="open in opened">
+					<!-- ! 
+					Display defect information as a list of tickets for this particular step.
+					Initially all tickets are created with a status of 
+					Strike out tickets that are resolved. 
+					-->
+					
+					<py:choose test="open.status">
+						<py:when test="'closed'">
+							<a href="${href.ticket(open.ticket_id)}" target="_blank"  ><del>${open.ticket_id}:[ ${open.resolution} ]</del></a>
+						</py:when>
+						<py:otherwise>
+							<!-- display current status of ticket -->
+							<py:choose test="">
+								<py:when test="open.sqa_review">
+								<!-- !
+								[ticket-custom]
+	 
+								sqa_review = select
+								sqa_review.label = Review Status
+								sqa_review.options = Researching|Review|Testing|QA
+								sqa_review.value = Researching
+
+								-->
+									<a href="${href.ticket(open.ticket_id)}" target="_blank"  >${open.ticket_id}: ${open.sqa_review}</a>
+								</py:when>
+								<py:otherwise>
+									<a href="${href.ticket(open.ticket_id)}" target="_blank"  >Open Ticket [ ${open.ticket_id} ]</a>
+								</py:otherwise>
+							</py:choose>	
+							
+							
+						</py:otherwise>
+					</py:choose>
+					<!-- 
+					Note: Add feature to send comment variable to existing ticket. 
+					This will populate the ticket commnet section with details referencing the 
+					current test run. 
+					
+					Example
+					Tester determines that a defect is found in step 5. 
+					Several defects have already been registered. If the defect is similar 
+					to an existing ticket, automatically populate the comment section with some
+					information about the current testing experience. 
+					"/ticket/1?comment=this+is+a+test+comment" 
+					
+					-->
+				</li>
+				<li>
+					<a href="${href.report()}" target="_blank" >See All</a>
+					
+				</li>
+			</ul>
+		</div>
+	</fieldset>	
+</div>
+<!--! Create new case  -->
+<py:choose test="">
+	<py:when test="ticket_created">
+		<div id="ticketNew" >
+			<fieldset>
+				<legend>Ticket Created</legend>
+				<div>
+					Ticket Number ${ticket_created} is set.
+				</div>
+			</fieldset>
+		</div>
+		
+	</py:when>
+	<py:otherwise>
+		<div id="ticketNew" >
+			<form id="testticket_${step}" method="post" py:with="revoke_perm = 'PERMISSION_REVOKE' in perm" action="">
+			<fieldset>
+			   	<legend>Create ticket for Step [${step}] {ID:${case_id}}:</legend>
+				<input type="hidden" name="reg_id" value="${reg}" />
+				<input type="hidden" name="step" value="${step}" />
+				<input type="hidden" name="case_step_id" value="${case_id}" />
+				<div >
+					<div py:for="item in ticket" id="ticket_field" >	
+						<div py:choose="item.display">
+							<span py:when="'yes'">
+								<div py:choose="item.type">
+									<span py:when="'text'">
+										<label for="${item.name}">${item.label}:</label><input type="text" id="${item.name}" name="${item.name}"   />
+									</span>
+									<span py:when="'textarea'">
+										<fieldset>
+										<legend>${item.label}:</legend>
+										<textarea id="desc_wiki_${step}" cols="85" rows="10" name="${item.name}" class="wikitext trac-resizable"  ></textarea>
+										</fieldset>
+									</span>
+									<span py:when="'radio'">
+										<fieldset>
+											<legend>${item.label}</legend>
+											<py:for each="option in item.options">
+												<label for="${option}">${option}:</label><input type="radio" id="${option}" name="${item.name}" value="${option}" />
+											</py:for>
+										</fieldset>
+									</span>
+									<span py:when="'select'">
+										
+										<label for="${item.name}">${item.label}:</label> <select id="${item.name}" name="${item.name}" >
+											<py:for each="option in item.options">
+												<option value="${option}">${option}</option>
+											</py:for>
+										</select>
+									</span>
+								</div>
+							</span>
+							<!-- !
+							<span py:when="'description'">
+								<fieldset>
+								<legend>${item.label}:</legend>
+								<textarea id="desc_wiki_${step}" cols="85" rows="10" name="item.name" class="wikitext trac-resizable"  ></textarea>
+								</fieldset>
+							</span>
+							-->
+							
+							<span py:otherwise="">
+								<py:choose>
+									<py:when test="item.value">
+										<input type="hidden" name="${item.name}" value="${item.value}" />
+									</py:when>
+									<py:otherwise>
+										<!-- Updated: 08/05/2011: Change default ticke create behavior to leave fields blank if no input value is given
+										This will replace the current action of adding the values 'UNDEFINED' -->
+										<input type="hidden" name="${item.name}" value=""  />
+									</py:otherwise>
+								</py:choose>	
+							</span> 
+							
+							
+						</div>
+					</div>
+					<div>
+						<input type="submit" name="sqa_control" value="${_('Create Ticket')}" />
+					</div>
+				</div>
+			</fieldset>
+			</form>
+		</div>
+	</py:otherwise>
+</py:choose>
+
+<!--! Save  
+<div id="ticketNew" >
+	<form id="testticket_${step}" method="post" py:with="revoke_perm = 'PERMISSION_REVOKE' in perm" action="">
+	<fieldset>
+	   	<legend>Create ticket for Step [${step}] :</legend>
+		<input type="hidden" name="plan_id" value="${plan}" />
+		<input type="hidden" name="reg_id" value="${reg}" />
+		<input type="hidden" name="step_id" value="${step}" />
+		<div >
+			<div py:for="item in ticket" id="ticket_field" >
+				<div py:choose="item.type">
+					<span py:when="'text'">
+						<label for="item.name">${item.label}:</label><input type="text" id="item.name" name="item.name"   />
+					</span>
+					<span py:when="'textarea'">
+						<fieldset>
+						<legend>${item.label}:</legend>
+						<textarea id="item.name" cols="85" rows="10" class="wikitext trac-resizable" name="item.name" ></textarea>
+						</fieldset>
+					</span>
+					<span py:when="'radio'">
+						<fieldset>
+							<legend>${item.label}</legend>
+							<py:for each="option in item.options">
+								<label for="option">${option}:</label><input type="radio" id="option" name="item.name" value="option" />
+							</py:for>
+						</fieldset>
+					</span>
+					<span py:when="'select'">
+						
+						<label for="item.name">${item.label}:</label> <select id="item.name" name="item.name" >
+							<py:for each="option in item.options">
+								<option value="option">${option}</option>
+							</py:for>
+						</select>
+					</span>
+				</div>
+			</div>
+		</div>
+	</fieldset>
+	</form>
+</div>
+-->
+</div>
+</html>

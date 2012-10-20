@@ -1,0 +1,10 @@
+	<div id="caseSelectDiv"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:py="http://genshi.edgewall.org/" >
+		<label for="testCaseSelect">Select Test Case : </label>
+		<select id="testCaseSelect" name="testCaseSelect">
+			<option disabled="true" value="NoValue" selected="selected" >- Select Test Case -</option>
+			<option py:for="plan in plans" value="${plan.id}" >${plan.plan_name}</option>
+            <option value="__newtest"  py:if="('SQA_ADMIN' in perm)" >- Create New Test -</option>
+		</select>
+	</div>	

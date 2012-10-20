@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:py="http://genshi.edgewall.org/">
+      <xi:include href="../layout.html" />	
+
+  <head>
+    <title>Calendar View</title>
+</head>
+<body>
+<div id="content" class="pm-content">
+ <h1>Plan Manager</h1>  
+	<div class='pm-main'>
+	  	<div class='pm-cal-gantt'>
+			<div id='pm-cal'>
+	  		</div>
+			<div id='pm-gantt'>
+			</div>
+	 	</div>
+	 	 
+	 	 <form id='prefs' method='get' action='' >
+	 	 	<input type="hidden" name="pm_url" id="_pm_ajax_url" value="${href.pm('ajax')}" />
+	 	 	<input type='hidden' name='areq' value='pm_cal_req'> </input>
+		 	 <div>
+		 	 <!-- 
+		 	 <fieldset style="display: none;">
+		 	 	<label>Milestone Filter 
+		 	 	</label>
+		 	 	<label>
+		 	 		<select name='milestone_sel' class='pm-ms-sel' >
+		 	 			<option > - All Milestones - </option>
+		 	 		</select>
+		 	 	</label>
+		 	 </fieldset>
+		 	 --> 
+		 	 </div>
+		 	 <fieldset>
+			 	 <label>
+			 	 	<input type='checkbox' value='milestone' name='pm-cal-filter' checked='checked' class='pm-cal-chkbx' > Show Milestones </input>
+			 	 </label>
+			 	 <fieldset>
+			 	 	<label>
+			 	 	<input type='checkbox' value='milestone_complete' name='pm-cal-filter-opt' class='pm-cal-chkbx' > Show Complete Milestones </input>
+			 	 	</label>
+			 	 </fieldset>
+			 	 <label>
+			 	 	<input type='checkbox' value='ticket' name='pm-cal-filter' checked='checked' class='pm-cal-chkbx' >  Show Tickets </input>
+			 	 </label>
+			 	 <fieldset>
+			 	 	<label>
+			 	 	<input type='checkbox' value='ticket_closed' name='pm-cal-filter-opt' class='pm-cal-chkbx' > Show Closed Tickets </input>
+			 	 	</label>
+			 	 </fieldset>
+			 	  <label>
+			 	 	<input type='checkbox' value='changeset'  name='pm-cal-filter' class='pm-cal-chkbx' > Show ChangeSets </input>
+			 	 </label>
+			 	 <!-- Future Work 
+			 	 <label>
+			 	 	<input type='checkbox' value='maintenance' name='pm-cal-filter' class='pm-cal-chkbx' > Show Maintenance Windows </input>
+			 	 </label>
+			 	 <label>
+			 	 	<input type='checkbox' value='custom' name='pm-cal-filter' class='pm-cal-chkbx' > Show Events </input>
+			 	 </label>
+			 	 <label>
+			 	 	<input type='checkbox' value='wiki'  name='pm-cal-filter' class='pm-cal-chkbx' > Show Wiki </input>
+			 	 </label>
+			 	  -->
+		 	 </fieldset>
+		 	 <div>
+		 	 	<input type='button' name='pb-cal-updateBtn' value='Update Calendar' id='pm-cal-submit'></input>
+		 	 </div>
+	 	 </form>
+	</div>
+
+</div>
+</body>
+  
+
+
+</html>	

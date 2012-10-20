@@ -17,8 +17,7 @@ from trac.wiki.formatter import format_to_html
 from trac.perm import IPermissionRequestor
 
 # Local plugin components 
-#from tracpm.model import *
-#from tracsqa.api import *
+from tracpm.model import *
 '''
 Helpful Links
 http://trac.edgewall.org/wiki/TracDev
@@ -26,6 +25,7 @@ http://www.edgewall.org/docs/tags-trac-0.12.2/epydoc/
 http://groups.google.com/group/trac-dev
 http://groups.google.com/group/trac-users
 '''
+
 
 class PmPlugin(Component):
     '''
@@ -68,7 +68,7 @@ class PmPlugin(Component):
         # -- Request Handler Methods
     def match_request(self, req):
         ''' REQUEST DISPATCHER - Controls what request this dispatcher will manage
-        in this case the dispatcher is repsonsible for the sqa domain.
+        in this case the dispatcher is repsonsible for the pm domain.
         Accept any combination of values on the usr string
         pass request to parser to determine matching template'''
         
@@ -168,35 +168,52 @@ class PmPlugin(Component):
         '''
             Create a resource realm for the test item
         '''
+        EventModel = EventData(self.env, None)
         context = Context.from_request(req)
         context.realm = 'pm'
 	''' Render Content ''' 
         director = self._parse_url_request(req)
         data = {} 
-        #add_stylesheet(req, 'sp/css/sqa.css')
+        
         add_stylesheet(req, 'ht/css/pm.css')
         add_stylesheet(req, 'ht/css/fullcalendar.css')
         add_stylesheet(req, 'ht/css/jquery-ui-1.8.16.sqa.css')
-        # Jquery Table plugin uses trac default version of jquery 1.4.2 (as of version 0.12.2)
-        
-        #add_javascript(req, 'common/js/wikitoolbar.js')
-        #add_javascript(req, 'common/js/folding.js')
-        
+                
         add_javascript(req, 'ht/js/fullcalendar.js')
         add_javascript(req, 'ht/js/jquery-ui-1.8.16.custom.min.js')
         add_javascript(req, 'ht/js/jquery.flot.js')
         add_javascript(req, 'ht/js/jquery.flot.pie.js')
-        #add_javascript(req, 'sp/js/ws_tcTable.js')
+
 
         add_javascript(req, 'ht/js/pm.js')
+        
+        self.log.debug("--> Got this request: %s and %s" % (req, req.args))
         
         if (req.args.has_key('areq')):
             '''
             Process AJAX request
             '''    
             self.log.debug("Processing AJAX Request %s" %(req.args['areq']) )    
-        
-        
+            #if (req.method == 'POST'):
+            if (req.args['areq'] == 'pm_cal_req'):
+                ''' '''
+                self.log.debug("Got Calendar Refresh Request [Args] -> %s" %(req.args['areq']) )    
+                json_data = EventModel.getEventData(req)
+                self.log.debug("JSON CONTENT - %s" %(json_data) ) 
+
+                '''
+                BYPASS Trac template processing
+                Return RAW data feeds...
+                '''                
+                self.log.debug("Length of Json String ----> %s" %(len(json_data)) )   
+                req.send_header('content-length', len(json_data) )
+                req.write(json_data)
+                return 
+
+                
+                
+                    
+            
         return 'pm/main.html', data, None
 
         

@@ -1,0 +1,40 @@
+ <div id="tab-content" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:py="http://genshi.edgewall.org/" >
+    <!-- List custom SQA ticket options -->
+	<table>
+		<tr>
+			<td>
+			<div py:for="item in ticket" id="ticket_field" >
+				<div py:choose="item.type">
+					<span py:when="'text'">
+						<label for="${item.name}">${item.label}:</label><input type="text" id="${item.name}" name="${item.name}"   />
+					</span>
+					<span py:when="'textarea'">
+						<fieldset>
+						<legend>${item.label}:</legend>
+						<textarea id="${item.name}" cols="85" rows="10" class="wikitext trac-resizable" name="${item.name}" ></textarea>
+						</fieldset>
+					</span>
+					<span py:when="'radio'">
+						<fieldset>
+							<legend>${item.label}</legend>
+							<py:for each="option in item.options">
+								<label for="option">${option}:</label><input type="radio" id="${option}" name="${item.name}" value="${option}" />
+							</py:for>
+						</fieldset>
+					</span>
+					<span py:when="'select'">
+						
+						<label for="${item.name}">${item.label}:</label> <select id="${item.name}" name="${item.name}" >
+							<py:for each="option in item.options">
+								<option value="${option}">${option}</option>
+							</py:for>
+						</select>
+					</span>
+				</div>
+			</div>
+			</td>	
+		</tr>
+	</table>
+</div>

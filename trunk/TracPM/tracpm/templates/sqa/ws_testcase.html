@@ -1,0 +1,43 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:py="http://genshi.edgewall.org/" >
+<script type="text/javascript" language="javascript">
+$(function() {	
+	// Show menu in admin tab
+	$("#testAdminDiv #testPlanOptions #adminOptions").show();
+	
+	
+	$("#testPlanDiv #testPlanOptions #executionOptions").show();
+});
+</script>  	
+<table id="testPlanOptions">
+	<tr id="adminOptions" class="hidden"> 
+		<td class="testPlanLink testOptionLink" id="ReorderSteps">Click to Re-Order Steps</td> 
+		<td class="testPlanLink testOptionLink" id="UpdateChanges">Update Changes</td> 
+	</tr>
+	<tr id="executionOptions" class="hidden"> 
+		<td class="testPlanLink testOptionLink" id="ExecuteCase" >Execute Test</td>
+	</tr>
+</table>
+
+<h2>Test Case: &nbsp; ${plan.plan_name}  &nbsp;&nbsp;   (&nbsp; ${plan.test_type} Test &nbsp; )</h2>
+	<!-- Test attributes -->
+	<input type="hidden" name="test_plan_id" id="testExecPlanId" value="${plan.id}" />
+	<input type="hidden" name="test_step_count" id="tesPlanStepCount" value="${steps.count}" />
+	<div id="tesPlanRegID" class="hidden" >	</div>
+	<div id="testCondition" class="hidden" >
+		<xi:include href="inc_testRunConditions.html" />
+	</div>
+	<div id="testComment" class="hidden">
+	</div>
+
+
+	<div id="testTable">
+		<!-- Load Test -->
+  		<xi:include href="inc_testPlanTable.html" />
+  	</div>
+	
+</div>
+
+
+

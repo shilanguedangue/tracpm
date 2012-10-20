@@ -1,0 +1,85 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:py="http://genshi.edgewall.org/">
+
+<body>
+	<py:choose test="log_count">
+	 <py:when test="0">
+	 	<div>
+	 		<h3>No Logs Found</h3>
+	 	</div>
+	 </py:when>
+	 <py:otherwise>
+	 	<table class="listing">
+	 	<thead>
+		<tr>
+			<th style="width: 15px;">Log ID</th>
+			<th style="width: 15px;">Exec Order</th>
+			<th>Result</th>
+			<th>Result Notes</th>
+			<th style="width: 15px;">Test Case ID</th>
+			<th>Run Time</th>
+						
+		</tr>
+		</thead>	 	
+	 	<py:for each="log in test_log" >
+	 		<tr>
+	 			<td>${log.log_id}</td>
+				<td>${log.test_order}</td>
+				<td id="${log.result_status}">${log.result_status}</td>
+				<td>${log.actual_result}</td>
+				<td>${log.case_step_id}</td>
+				<td>${log.update_ts}</td>
+				
+				
+	 		</tr>
+			<py:choose test="log.result_status">
+	 		 <py:when test="'Failed'">
+		 		 <py:choose test="">
+		 		 <py:when test="log.ticket_id">
+					<tr style="background-color: #F5F6CE; opacity: 10;">
+						<td colspan="10">
+							Trac Ticket - <a href="${href.ticket(log.ticket_id)}" target="_blank"  >[ ${log.ticket_id} ] Recorded: ${log.tickt_create_ts} </a>
+							
+							<!--! 
+							<div>
+							 <table>
+								<thead>
+								 <tr>
+								  <th>Trac Ticket</th>
+								  <th>Ticket Created</th>
+								 </tr>
+								</thead>
+								<tr>
+									<td><a href="${href.ticket(log.ticket_id)}" target="_blank"  >[ ${log.ticket_id} ] Recorded: ${log.tickt_create_ts} </a></td>	
+									<td>${log.tickt_create_ts}</td>
+								</tr>
+								</table>
+							</div>
+							-->
+						</td>
+					</tr>
+				</py:when>
+				<py:otherwise>
+					<tr>
+						<td colspan="10">
+					<div><h3 style="color: red;">Test Failed [No Ticket Recorded]</h3></div>
+					</td>
+					</tr>
+				</py:otherwise>
+			  </py:choose>
+			</py:when>
+			</py:choose>
+	 	</py:for>
+		
+		</table>
+	 </py:otherwise>
+	</py:choose>
+</body>
+
+      
+	  
+</html>	

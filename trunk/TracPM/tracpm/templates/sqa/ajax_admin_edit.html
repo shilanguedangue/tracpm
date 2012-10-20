@@ -1,0 +1,86 @@
+<tr  class="editHover adminStepEditList"  xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:py="http://genshi.edgewall.org/" id="${edit_step}_data" >
+<script>
+$(function() {	
+	$('body').data('update_edit', "${href.sqa('ws_admin_update')}")
+});
+</script>
+<input type="hidden"  name="item_count" value="${step_num}"/>
+<input type="hidden" value="${this_plan_id}" name="plan_id"  />
+<py:choose test="">
+	
+	<py:when test="_Edit">
+		<input type="hidden" class="EditID" name="case_id" value="${step_id}"/>
+		<input type="hidden"  name="_action" value="EDIT"/>
+		<td >
+			<div>Edit - ${step_num}</div>
+			<input type="button" class="editSave" id="${edit_step}" name="editAction" value="Update"/>
+			<input type="button" class="editSave" id="_cancel" name="editAction" value="Cancel"/>		
+		</td>
+		<td>	
+			<textarea name="test_procedure" class="stepProcedure adminEditor wikitext">${json_step.test_procedure}</textarea>
+			<label for="item_name">Step Name: </label><input type="text" name="item_name" value="${json_step.item_name}" size="40"/>
+		</td>
+		<td><textarea name="expected_result" class="expResult adminEditor wikitext">${json_step.expected_result}</textarea></td>	
+	</py:when>
+    
+	
+	<py:when test="_Insert">
+    	<input type="hidden"  name="_action" value="INSERT"/>
+		<td >	
+    		<div>${edit_step}</div>
+			<input type="button" class="editSave" id="${edit_step}" name="editAction" value="Update"/>
+			<input type="button" class="editSave" id="_cancel" name="editAction" value="Cancel"/>	
+		</td>
+				<td>	
+			<textarea name="test_procedure" class="stepProcedure adminEditor wikitext"></textarea>
+			<label for="item_name">Step Name: </label><input type="text" name="item_name" size="40"/>
+		</td>
+		<td><textarea name="expected_result" class="expResult adminEditor wikitext"></textarea></td>	
+   	</py:when>
+	
+	
+	<py:when test="_Append">
+		<input type="hidden"  name="_action" value="APPEND"/>
+    	<td >
+    		<div>${edit_step}</div>	
+			<input type="button" class="editSave" id="${edit_step}" name="editAction" value="Update"/>
+			<input type="button" class="editSave" id="_cancel" name="editAction" value="Cancel"/>	
+		</td>
+				<td>	
+			<textarea name="test_procedure" class="stepProcedure adminEditor wikitext"></textarea>
+			<label for="item_name">Step Name: </label><input type="text" name="item_name" size="40"/>
+		</td>
+		<td><textarea name="expected_result" class="expResult adminEditor wikitext"></textarea></td>	
+	</py:when>	
+	
+
+	<py:when test="_Update">
+		<!-- Show updated step -->
+    	<td width="10px" >
+			<div class="stepNum">${step.test_order}</div>
+			<div class="editOpts"></div>
+		</td>
+		<td class="hidden tp_exec" width="10px" >
+		  	<input type="button" id="step_pass" class="passfail_btn" name="${step.case_id}" value="pass" reg_num="${reg}"  />
+		  	<input type="button" id="step_fail" class="passfail_btn pflast fail_btn" name="${step.case_id}" value="fail" reg_num="${reg}" step_num="${step.test_order}"/>
+	  	</td>
+		<td id="${type}_procedure_${step.case_id}">	
+			<div id="_namegrp">
+				 <label id="_namelbl">${step.item_name}</label>
+			</div>
+			 <div id="_proceduregrp">
+				 <label id="_lbl">Test Procedure</label>
+			 </div>
+			 <div>
+			 	${step.test_procedure}
+			 </div>
+		</td>
+		<td id="${type}_expResult_${step.case_id}">
+			${step.expected_result}
+		</td>
+	</py:when>	
+</py:choose>
+	
+</tr>

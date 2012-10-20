@@ -1,0 +1,61 @@
+
+<div id="tab-heading" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:py="http://genshi.edgewall.org/" >
+      	
+<script>
+	$(function(){
+		$("#tabs-1, #tabl-1").data('map' ,{'content_url': 'ws_case/-', 'content_div': 'testPlanDiv'} );
+		$("#tabs-2, #tabl-2").data('map' ,{'content_url': 'ws_log/-', 'content_div': 'testLogDiv'} );
+		$("#tabs-3, #tabl-3").data('map' ,{'content_url': 'ws_report/-', 'content_div': 'testReportDiv'} );
+		$("#tabs-4, #tabl-4").data('map' ,{'content_url': 'ws_case/-', 'content_div': 'testAdminDiv'} );
+	});
+
+</script>
+
+
+	<div id="catalogSelectDiv">
+		<label for="milestoneSelect">Select Project : </label>
+		<select id="milestoneSelect" name="milestoneSelect">
+			<option disabled="true" value="NoValue" selected="selected" >- Select Project -</option>
+			<option py:for="action in ms_list" value="${action.name}" >${action.name}</option>
+            
+		</select>
+	</div>	
+    <div id="caseSelectWrapper"></div>
+
+
+	<div id="sqa_tabs">
+
+		<ul id="sqa_tabs_ul">
+			<li><a href="#tabs-1" id="tabl-1">Test Catalog</a></li>
+			<li><a href="#tabs-2" id="tabl-2">Test Logs</a></li>
+			<li><a href="#tabs-3" id="tabl-3">Reports</a></li>
+			<li py:if="('SQA_ADMIN' in perm)" >
+				<a href="#tabs-4" id="tabl-4">Administration</a>
+			</li>
+		</ul>
+		<div id="tabs-1">
+			<div id="tab1Div" class="tabClass">
+				<xi:include href="tab_test_plan.html" />	
+			</div>
+		</div>
+		<div id="tabs-2">
+			<div id="tab1Div" class="tabClass">
+				<xi:include href="tab_test_log.html" />	
+			</div>
+		</div>
+		<div id="tabs-3">
+			<div id="tab1Div" class="tabClass">
+				<xi:include href="tab_test_report.html" />
+			</div>
+		</div>
+		<div id="tabs-4" py:if="('SQA_ADMIN' in perm)" >
+			<div id="tab1Div" class="tabClass">
+				<xi:include href="tab_test_admin.html" />
+			</div>
+		</div>
+			
+	</div>
+
+</div>	

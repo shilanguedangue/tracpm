@@ -1,0 +1,202 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:py="http://genshi.edgewall.org/">
+  <xi:include href="sqa_nav.html" />
+
+  <head>
+    <title>Collections</title>
+	<script>
+  		$(document).ready(function(){
+    		$("#addStep").validate();
+  		});
+    </script>
+  </head>
+
+  <body>
+  	<h2>Test Case - ${plan.plan_name}</h2>
+	
+	
+	
+  	<py:choose test="edit">
+  		<!-- Display when a test case is selected (plan attribute set) -->
+		
+	<py:when test="edit">
+	 <!-- !
+	 Form to add new items to test case
+	 -->
+
+	 <form id="addStep" class="addnew" method="post" action="">
+      <input type="hidden" name="sqa_control" value="add_case" />
+      <fieldset>
+	  	<legend>Add Step to Test Case: [ ${plan.plan_name} ] </legend>	 	
+		<!-- ! Capture plan_id - Unique id of test plan -->
+		<input type="hidden" name="plan_id" value="${plan.id}" />
+		<input type="hidden" name="item_count" value="${steps.count +1 }" />
+        
+		<div class="add_item">	
+          <label for="gp_subject">Step Name:</label>
+          <input id="gp_subject" type="text" name="item_name" class="required" minlength="2" /> 
+		</div>
+		<div class="add_item">	
+          <label for="s_cnt">Count:</label>
+          <input id="s_cnt" type="text" name="count_display" size="3"  value="${steps.count +1 }" disabled="true" /> 
+		</div>
+		
+		<div class="add_item">
+			<fieldset>
+				<legend>Test Procedure</legend>
+				<!--!  
+				<textarea cols="60" rows="8" name="test_procedure" ></textarea>
+				-->
+				<textarea cols="60" rows="8" name="test_procedure" class="wikitext required"></textarea>
+				
+			</fieldset>
+		</div>
+		
+		<div class="add_item">
+			<fieldset>
+				<legend>Expected Results</legend>
+				<!--! 
+				<textarea cols="60" rows="8" name="expected_results" ></textarea>
+				--> 
+				<textarea cols="60" rows="8" name="expected_results" class="wikitext required" ></textarea>
+				
+			</fieldset>
+		</div>	
+				 
+        <p class="help">
+          Add a step to the test case.
+		  
+        </p>
+		
+        <div class="buttons">
+          <input type="submit" name="add" value="${_('Add')}" />
+        </div>
+      </fieldset>
+    </form>
+	
+	</py:when>
+
+    </py:choose>
+	<!-- ! ================ END FORM CHOICES -->
+
+	
+	<!-- ! The section lists in the main window 
+	http://www.isocra.com/2008/02/table-drag-and-drop-jquery-plugin/
+		if the requestor did not select a test case then display a drop 
+		down to select a test
+	
+	<py:choose test="case">
+	  <py:when test="case">
+	   
+	  <py:choose test="plan">
+	  	 <py:when test="plan">
+	-->
+	<!--! ================ START DISPLAY CHOICES ================ 
+	<py:choose test="edit">
+	 <py:when test="edit">
+	 -->
+	 	<!-- !
+		
+		-->	
+		<!-- EDIT TEST CASE STEPS --> 
+    <form id="caseadd" method="post" py:with="revoke_perm = 'PERMISSION_REVOKE' in perm" action="">
+      <!-- !<input type="hidden" name="sqa_control" value="reorder_plan" /> -->
+	  <!-- ! Save the result of the table reodering here -->
+	  <input type="hidden" name="table_order" value="NOCHANGE" />
+	  <input type="hidden" name="plan_id" value="${plan.id}" />	
+	  	 <!-- Display test plan information 
+		  <ul id="casetabs">
+		  	<li>Milestone: ${plan.milestone}</li>
+			<li>Description: ${plan.description}</li>
+			<li>Test Type: ${plan.test_type}</li>
+		  </ul>
+		  -->
+		  <div>
+		  	<div>Milestone: ${plan.milestone}</div>
+
+			<div>Test Type: ${plan.test_type}</div>
+			<!--
+			<div>
+				<fieldset>
+					<legend>Description</legend>
+					${plan.description}
+				</fieldset>
+			</div>
+			-->
+		  </div>
+		  
+	
+		<py:choose test="edit">
+			<py:when test="edit">
+				<!-- !Editiing Choices --> 
+				<a href="${href.sqa('case', plan.id)}"> Exit Edit Mode </a>
+				<br/>
+				<!-- !
+				<input type="submit" name="sqa_control" value="${_('Reorder Steps')}" />
+				
+				
+					<input type="submit" name="sqa_control" value="${_('Disable Step')}" />
+					
+						<input type="submit" name="sqa_control" value="${_('Remove Step')}" />
+				-->
+			</py:when>
+			<py:otherwise>
+				<py:if test="'WIKI_MODIFY' in perm">
+				<a href="${href.sqa('exec', plan.id)}">Execute Test Case</a> 
+				||
+				<a href="${href.sqa('case', plan.id, 'edit')}">Edit Test Case</a>
+				</py:if>
+				<py:if test="'WIKI_MODIFY' not in perm">
+				Login to Edit and Execute Test Cases
+				</py:if>	
+			</py:otherwise>
+    	</py:choose>	
+
+	<xi:include href="testItem.html" />
+
+      <div class="buttons">
+      	
+        <!-- !Default Options
+		
+		 -->
+		
+		<py:choose test="edit">
+			<py:when test="edit">
+				<!-- !Editiing Choices --> 
+				<a href="${href.sqa('case', plan.id)}"> Exit Edit Mode </a>
+				<br/>
+				<input type="submit" name="sqa_control" value="${_('Reorder Steps')}" />
+				
+				<!-- REQUIRES EDIT RIGHTS -->
+					<input type="submit" name="sqa_control" value="${_('Disable Step')}" />
+					<!-- REQUIRES ADMIN RIGHTS -->
+						<input type="submit" name="sqa_control" value="${_('Remove Step')}" />
+					
+			</py:when>
+			<py:otherwise>
+				<py:if test="'WIKI_MODIFY' in perm">
+				<a href="${href.sqa('exec', plan.id)}">Execute Test Case</a> 
+				||
+				<a href="${href.sqa('case', plan.id, 'edit')}">Edit Test Case</a>
+				</py:if>
+				<py:if test="'WIKI_MODIFY' not in perm">
+				Login to Edit and Execute Test Cases
+				</py:if>	
+			</py:otherwise>
+    	</py:choose>	
+      </div>
+    </form>
+	<!--
+	</py:when>
+	-->
+	
+
+  
+  
+  
+  </body>
+</html>

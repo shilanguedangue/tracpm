@@ -47,7 +47,32 @@ class EventData(object):
         '''
             Get event data...
             Default
+            
+            Event Types
+            1. Milestones
+            2. Tickets
+            3. ChangeSets
+            4. Custom Events
+        
         '''
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         sql = '''
         SELECT 
         'MILESTONE' as TYPE, 
@@ -59,6 +84,8 @@ class EventData(object):
          substr(completed, 1, 10) as last_update
         from 
         milestone
+        where
+        
         UNION
         SELECT    
         'TICKET' as TYPE,

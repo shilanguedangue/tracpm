@@ -194,20 +194,22 @@ class PmPlugin(Component):
             Process AJAX request
             '''    
             self.log.debug("Processing AJAX Request %s" %(req.args['areq']) )    
-            #if (req.method == 'POST'):
             if (req.args['areq'] == 'pm_cal_req'):
-                ''' '''
-                self.log.debug("Got Calendar Refresh Request [Args] -> %s" %(req.args['areq']) )    
+                ''' '''    
+                
                 json_data = EventModel.getEventData(req)
-                self.log.debug("JSON CONTENT - %s" %(json_data) ) 
+                
+                #self.log.debug("JSON CONTENT - %s" %(json_data) ) 
 
                 '''
-                BYPASS Trac template processing
-                Return RAW data feeds...
+                    BYPASS Trac template processing
+                    Return RAW data feeds... no template
                 '''                
-                self.log.debug("Length of Json String ----> %s" %(len(json_data)) )   
+                #self.log.debug("Length of Json String ----> %s" %(len(json_data)) )   
+                
                 req.send_header('content-length', len(json_data) )
                 req.write(json_data)
+                
                 return 
 
                 

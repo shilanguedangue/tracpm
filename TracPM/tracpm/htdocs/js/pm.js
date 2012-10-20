@@ -40,6 +40,7 @@ $(document).ready(function() {
         		type: 'GET',
         		cache: true,
         		dataType: 'json',
+        		// URL from main.html prefs form...
         		url: $('#_pm_ajax_url').val(),
         		data: pm_data,
         		success: function(response_data) {

@@ -54,26 +54,129 @@ class EventData(object):
             3. ChangeSets
             4. Custom Events
         
+        
+        Request Example
+         Got this request: 
+         <Request "GET '/pm/ajax'"> and 
+         {
+         'pm-cal-filter': 
+         [
+         u'milestone', 
+         u'ticket', 
+         u'changeset'
+         ], 
+         'end': u'1352610000', 
+         'start': u'1348977600',
+         'pm-cal-filter-opt': 
+         [
+         u'milestone_complete', 
+         u'ticket_closed'
+         ],  
+         'pm_url': u'/tracfox/pm/ajax', 
+         'areq': u'pm_cal_req'
+         }
+        
         '''
+        args = req.args
         
+        sql_list = []
+        for item in args['pm-cal-filter']:
+            if (item == 'milestone') :
+                sql.append = '''
+              SELECT 
+              'MILESTONE'        as 1,
+              'NULL'             as 2,
+              name               as 3,
+              'NULL'             as 4,
+              'NULL'             as 5,
+              substr(due,1,10)   as 6,
+              substr(complete,1,10) as 7
+              FROM
+              milestone
+              WHERE
+                complete = 0
+                and
+                substr(due, 1,10 ) 
+              BETWEEN
+               %s and %s
+              ''' %(args.start, args.end)
+            elif (item == 'ticket') :
+                sql.append = '''
+              SELECT  
+              'TICKET'           as 1,
+              id                 as 2,
+              milestone          as 3,
+              summary            as 4,
+              status             as 5,
+              substr(time,1,10)   as 6,
+              substr(changetime,1,10) as 7
+              FROM
+              ticket
+              WHERE
+                substr(time, 1,10 ) 
+              BETWEEN
+               %s and %s
+              ''' %(args.start, args.end)
+            elif (item == 'changeset') :
+                sql.append = '''
+              SELECT  
+              'CHANGESET'           as 1,
+              rev                   as 2,
+              repos                 as 3,
+              message               as 4,
+              author                as 5,
+              substr(time,1,10)     as 6,
+              substr(changetime,1,10) as 7
+              FROM
+              revision
+              WHERE
+                substr(time, 1,10 ) 
+              BETWEEN
+               %s and %s
+              ''' %(args.start, args.end)  
+                
+ 
+        for item in args['pm-cal-filter-opt']:
+            if (item == 'milestone_complete') :
+                sql.append = '''
+              SELECT 
+              'MILESTONE'        as 1,
+              'NULL'             as 2,
+              name               as 3,
+              'NULL'             as 4,
+              'NULL'             as 5,
+              substr(due,1,10)   as 6,
+              substr(complete,1,10) as 7
+              FROM
+              milestone
+              WHERE
+                substr(complete, 1,10 ) 
+              BETWEEN
+               %s and %s
+              ''' %(args.start, args.end) 
+            elif (item == 'ticket') :
+                sql.append = '''
+              SELECT  
+              'TICKET'           as 1,
+              id                 as 2,
+              milestone          as 3,
+              summary            as 4,
+              status             as 5,
+              substr(time,1,10)   as 6,
+              substr(changetime,1,10) as 7
+              FROM
+              ticket
+              WHERE
+              status = 'closed'
+              and 
+                substr(changetime, 1,10 ) 
+              BETWEEN
+               %s and %s
+              ''' %(args.start, args.end)
+ 
+        sql = ' UNION '.join(sql_list)
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        sql = '''
+        __sql = '''
         SELECT 
         'MILESTONE' as TYPE, 
         'NULL' as EVENT_ID,
@@ -102,6 +205,7 @@ class EventData(object):
         milestone_name,  
         last_update desc
         '''
+        self.env.log.debug("- SQL -  %s" %(sql))
         columns = ['TYPE', 'EVENT_ID', 'MILESTONE_NAME', 'TITLE', 'STATUS', 'EVENT_START', 'EVENT_END']
         cursor = self.db.cursor()
         cursor.execute(sql)

@@ -78,102 +78,111 @@ class EventData(object):
         
         '''
         args = req.args
+        timeframe = {'START': args['start']  , 'END': args['end']}
         
         sql_list = []
-        for item in args['pm-cal-filter']:
-            if (item == 'milestone') :
-                sql.append = '''
-              SELECT 
-              'MILESTONE'        as 1,
-              'NULL'             as 2,
-              name               as 3,
-              'NULL'             as 4,
-              'NULL'             as 5,
-              substr(due,1,10)   as 6,
-              substr(complete,1,10) as 7
-              FROM
-              milestone
-              WHERE
-                complete = 0
-                and
-                substr(due, 1,10 ) 
-              BETWEEN
-               %s and %s
-              ''' %(args.start, args.end)
-            elif (item == 'ticket') :
-                sql.append = '''
-              SELECT  
-              'TICKET'           as 1,
-              id                 as 2,
-              milestone          as 3,
-              summary            as 4,
-              status             as 5,
-              substr(time,1,10)   as 6,
-              substr(changetime,1,10) as 7
-              FROM
-              ticket
-              WHERE
-                substr(time, 1,10 ) 
-              BETWEEN
-               %s and %s
-              ''' %(args.start, args.end)
-            elif (item == 'changeset') :
-                sql.append = '''
-              SELECT  
-              'CHANGESET'           as 1,
-              rev                   as 2,
-              repos                 as 3,
-              message               as 4,
-              author                as 5,
-              substr(time,1,10)     as 6,
-              substr(changetime,1,10) as 7
-              FROM
-              revision
-              WHERE
-                substr(time, 1,10 ) 
-              BETWEEN
-               %s and %s
-              ''' %(args.start, args.end)  
-                
- 
-        for item in args['pm-cal-filter-opt']:
-            if (item == 'milestone_complete') :
-                sql.append = '''
-              SELECT 
-              'MILESTONE'        as 1,
-              'NULL'             as 2,
-              name               as 3,
-              'NULL'             as 4,
-              'NULL'             as 5,
-              substr(due,1,10)   as 6,
-              substr(complete,1,10) as 7
-              FROM
-              milestone
-              WHERE
-                substr(complete, 1,10 ) 
-              BETWEEN
-               %s and %s
-              ''' %(args.start, args.end) 
-            elif (item == 'ticket') :
-                sql.append = '''
-              SELECT  
-              'TICKET'           as 1,
-              id                 as 2,
-              milestone          as 3,
-              summary            as 4,
-              status             as 5,
-              substr(time,1,10)   as 6,
-              substr(changetime,1,10) as 7
-              FROM
-              ticket
-              WHERE
-              status = 'closed'
-              and 
-                substr(changetime, 1,10 ) 
-              BETWEEN
-               %s and %s
-              ''' %(args.start, args.end)
- 
+        if (args.has_key('pm-cal-filter')):
+            for item in args['pm-cal-filter']:
+                if (item == 'milestone') :
+                    sql_string =  '''
+                  SELECT 
+                  'MILESTONE'        as A,
+                  'NULL'             as B,
+                  name               as C,
+                  'NULL'             as D,
+                  'NULL'             as E,
+                  substr(due,1,10)   as F,
+                  substr(completed,1,10) as G
+                  FROM
+                  milestone
+                  WHERE
+                    completed = 0
+                    and
+                    CAST (substr(due, 1,10 ) as INT) 
+                  BETWEEN
+                   %(START)s and %(END)s
+                  ''' 
+                    sql_list.append(sql_string)
+                    
+                elif (item == 'ticket') :
+                    sql_string = '''
+                  SELECT  
+                  'TICKET'           as A,
+                  id                 as B,
+                  milestone          as C,
+                  summary            as D,
+                  status             as E,
+                  substr(time,1,10)   as F,
+                  substr(changetime,1,10) as G
+                  FROM
+                  ticket
+                  WHERE
+                    CAST(substr(time, 1,10 ) as INT) 
+                  BETWEEN
+                   %(START)s and %(END)s
+                  ''' 
+                    sql_list.append(sql_string)
+                elif (item == 'changeset') :
+                    sql_string = '''
+                  SELECT  
+                  'CHANGESET'           as A,
+                  rev                   as B,
+                  repos                 as C,
+                  message               as D,
+                  author                as E,
+                  substr(time,1,10)     as F,
+                  substr(changetime,1,10) as G
+                  FROM
+                  revision
+                  WHERE
+                    CAST(substr(time, 1,10 ) as INT) 
+                  BETWEEN
+                   %(START)s and %(END)s
+                  '''  
+                    sql_list.append(sql_string)
+     
+        if (args.has_key('pm-cal-filter-opt')):
+        
+            for item in args['pm-cal-filter-opt']:
+                if (item == 'milestone_complete') :
+                    sql_string = '''
+                  SELECT 
+                  'MILESTONE'        as A,
+                  'NULL'             as B,
+                  name               as C,
+                  'NULL'             as D,
+                  'NULL'             as E,
+                  substr(due,1,10)   as F,
+                  substr(completed,1,10) as G
+                  FROM
+                  milestone
+                  WHERE
+                    CAST(substr(completed, 1,10 ) as INT) 
+                  BETWEEN
+                   %(START)s and %(END)s
+                  '''
+                    sql_list.append(sql_string) 
+                elif (item == 'ticket_closed') :
+                    sql_string = '''
+                  SELECT  
+                  'TICKET'           as A,
+                  id                 as B,
+                  milestone          as C,
+                  summary            as D,
+                  status             as E,
+                  substr(time,1,10)   as F,
+                  substr(changetime,1,10) as G
+                  FROM
+                  ticket
+                  WHERE
+                  status = 'closed'
+                  and 
+                    CAST(substr(changetime, 1,10 ) as INT) 
+                  BETWEEN
+                   %(START)s and %(END)s
+                  ''' 
+                    sql_list.append(sql_string)
+     
         sql = ' UNION '.join(sql_list)
         
         __sql = '''
@@ -205,12 +214,18 @@ class EventData(object):
         milestone_name,  
         last_update desc
         '''
+        
+        
+        sql = sql % ( timeframe )
         self.env.log.debug("- SQL -  %s" %(sql))
         columns = ['TYPE', 'EVENT_ID', 'MILESTONE_NAME', 'TITLE', 'STATUS', 'EVENT_START', 'EVENT_END']
         cursor = self.db.cursor()
+        
+        
+        
         cursor.execute(sql)
 
-        # Convert events into dicttionary object
+        # Convert events into dictionary object
         events = [dict(zip(columns, event)) for event in cursor]
         _json_array = []
         for event in events:

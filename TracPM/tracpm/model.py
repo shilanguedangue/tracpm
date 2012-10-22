@@ -88,8 +88,8 @@ class EventData(object):
                   SELECT 
                   'MILESTONE'        as A,
                   'NULL'             as B,
-                  name               as C,
-                  'NULL'             as D,
+                  'NULL'               as C,
+                  name             as D,
                   'NULL'             as E,
                   substr(due,1,10)   as F,
                   substr(completed,1,10) as G
@@ -149,7 +149,7 @@ class EventData(object):
                 if (item == 'milestone_complete') :
                     sql_string = '''
                   SELECT 
-                  'MILESTONE'        as A,
+                  'MILESTONE_CLOSED'        as A,
                   'NULL'             as B,
                   name               as C,
                   'NULL'             as D,
@@ -167,7 +167,7 @@ class EventData(object):
                 elif (item == 'ticket_closed') :
                     sql_string = '''
                   SELECT  
-                  'TICKET'           as A,
+                  'TICKET_CLOSED'           as A,
                   id                 as B,
                   milestone          as C,
                   summary            as D,
@@ -185,47 +185,21 @@ class EventData(object):
                   ''' 
                     sql_list.append(sql_string)
      
-        sql = ' UNION '.join(sql_list)
-        
-        __sql = '''
-        SELECT 
-        'MILESTONE' as TYPE, 
-        'NULL' as EVENT_ID,
-        name as milestone_name,
-        name as TITLE,
-        'STATUS-NULL' as STATUS,  
-         substr(due, 1, 10), 
-         substr(completed, 1, 10) as last_update
-        from 
-        milestone
-        where
-        
-        UNION
-        SELECT    
-        'TICKET' as TYPE,
-        id as EVENT_ID,
-        milestone as milestone_name,
-        summary as TITLE,
-        status as STATUS,
-        substr(time, 1, 10),
-        substr(changetime, 1,10) as last_update
-        from 
-        ticket 
-        where milestone is not NULL
-        order by   
-        milestone_name,  
-        last_update desc
-        '''
-        
+        sql = ' UNION '.join(sql_list)      
         
         sql = sql % ( timeframe )
         self.env.log.debug("- SQL -  %s" %(sql))
         columns = ['TYPE', 'EVENT_ID', 'MILESTONE_NAME', 'TITLE', 'STATUS', 'EVENT_START', 'EVENT_END']
         cursor = self.db.cursor()
         
-        
-        
         cursor.execute(sql)
+        EVENT_COLORS = {
+        'MILESTONE': 'red',
+        'TICKET' : 'green',
+        'CHANGESET': 'yellow',
+        'MILESTONE_CLOSED': 'black',
+        'TICKET_CLOSED': 'grey'
+        }
 
         # Convert events into dictionary object
         events = [dict(zip(columns, event)) for event in cursor]
@@ -235,13 +209,15 @@ class EventData(object):
             if(event['TYPE'] == 'MILESTONE'):
                 ''' Create a milestone event '''
                 self.env.log.debug("MILESTONE %s" %(event))
-                _json_array.append({'title': event['TITLE'], 'start': event['EVENT_START'],'end': event['EVENT_END']})
+                _json_array.append({'title': event['TITLE'], 'start': event['EVENT_START'],'end': event['EVENT_END'] , 'color': EVENT_COLORS[event['TYPE']] })
                 #event
                 #_json_array.append()
             elif event['TYPE'] == 'TICKET':
                 ''' Create a milestone event '''
                 self.env.log.debug("TICKET %s" %(event))
-                _json_array.append({'title': event['TITLE'], 'start': event['EVENT_START'],'end': event['EVENT_END']})
+                ticket_display = '#' + str(event['EVENT_ID']) + ' ' + event['TITLE']
+                ticket_url = args['_trac_url'] + '/ticket/' +  str(event['EVENT_ID']) 
+                _json_array.append({'title':  ticket_display, 'start': event['EVENT_START'],'end': event['EVENT_END'] , 'color': EVENT_COLORS[event['TYPE']], 'url': ticket_url })
             
         json_feed = json.dumps(_json_array)
         self.env.log.debug("JSON DATA %s" %(_json_array))
@@ -284,8 +260,9 @@ substr(time, 1, 10) as last_update
 FROM ticket_change 
 where field = 'status') 
 order by   milestone_name,  last_update desc
+
+
 '''
-        
         
 
 

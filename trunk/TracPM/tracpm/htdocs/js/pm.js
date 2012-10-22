@@ -35,7 +35,12 @@ $(document).ready(function() {
         		name: 'end',
         		value: Math.round(end.getTime() / 1000)
         	});
-        	
+        	/*
+        	pm_data.push ({
+        		name: '_trac_url',
+        		value: $('#_pm_trac_url').val()
+        	});
+        	*/
         	$.ajax({
         		type: 'GET',
         		cache: true,

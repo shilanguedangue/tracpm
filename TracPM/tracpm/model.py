@@ -151,8 +151,8 @@ class EventData(object):
                   SELECT 
                   'MILESTONE_CLOSED'        as A,
                   'NULL'             as B,
-                  name               as C,
-                  'NULL'             as D,
+                  'NULL'               as C,
+                  name             as D,
                   'NULL'             as E,
                   substr(due,1,10)   as F,
                   substr(completed,1,10) as G
@@ -183,12 +183,52 @@ class EventData(object):
                   BETWEEN
                    %(START)s and %(END)s
                   ''' 
+                    sql_list.append(sql_string) 
+                elif (item == 'ticket_milestone') :
+                    # show ticket by milestone
+                    sql_string = '''
+                  SELECT  
+                  'TICKET_MILESTONE' as A,
+                  id                 as B,
+                  milestone          as C,
+                  summary            as D,
+                  status             as E,
+                  substr(time,1,10)   as F,
+                  substr(changetime,1,10) as G
+                  FROM
+                  ticket
+                  WHERE
+                    CAST(substr(changetime, 1,10 ) as INT) 
+                  BETWEEN
+                   %(START)s and %(END)s
+                   '''
+                    sql_list.append(sql_string) 
+                elif (item == 'ticket_workflow') :
+                    # needs work.... 
+                    sql_string = '''
+                  SELECT  
+                  'TICKET_WORKFLOW'  as A,
+                  ticket                 as B,
+                  milestone          as C,
+                  summary            as D,
+                  newvalue             as E,
+                  substr(time,1,10)   as F,
+                  substr(changetime,1,10) as G
+                  FROM
+                  ticket_change
+                  WHERE
+                  field = 'status'
+                  and 
+                    CAST(substr(changetime, 1,10 ) as INT) 
+                  BETWEEN
+                   %(START)s and %(END)s
+                  ''' 
                     sql_list.append(sql_string)
      
         sql = ' UNION '.join(sql_list)      
         
         sql = sql % ( timeframe )
-        self.env.log.debug("- SQL -  %s" %(sql))
+        #self.env.log.debug("- SQL -  %s" %(sql))
         columns = ['TYPE', 'EVENT_ID', 'MILESTONE_NAME', 'TITLE', 'STATUS', 'EVENT_START', 'EVENT_END']
         cursor = self.db.cursor()
         
@@ -198,7 +238,8 @@ class EventData(object):
         'TICKET' : 'green',
         'CHANGESET': 'yellow',
         'MILESTONE_CLOSED': 'black',
-        'TICKET_CLOSED': 'grey'
+        'TICKET_CLOSED': 'grey',
+        'TICKET_MILESTONE': 'blue'
         }
 
         # Convert events into dictionary object
@@ -208,19 +249,38 @@ class EventData(object):
             # Process event data
             if(event['TYPE'] == 'MILESTONE'):
                 ''' Create a milestone event '''
-                self.env.log.debug("MILESTONE %s" %(event))
-                _json_array.append({'title': event['TITLE'], 'start': event['EVENT_START'],'end': event['EVENT_END'] , 'color': EVENT_COLORS[event['TYPE']] })
+                #self.env.log.debug("MILESTONE %s" %(event))
+                event_url = args['_trac_url'] + '/milestone/' +  event['TITLE'] 
+                _json_array.append({'title': event['TITLE'], 'start': event['EVENT_START'],'end': event['EVENT_END'] , 'color': EVENT_COLORS[event['TYPE']], 'url': event_url })
                 #event
                 #_json_array.append()
             elif event['TYPE'] == 'TICKET':
-                ''' Create a milestone event '''
-                self.env.log.debug("TICKET %s" %(event))
+                ''' Show milestone event '''
+                #self.env.log.debug("TICKET %s" %(event))
                 ticket_display = '#' + str(event['EVENT_ID']) + ' ' + event['TITLE']
-                ticket_url = args['_trac_url'] + '/ticket/' +  str(event['EVENT_ID']) 
-                _json_array.append({'title':  ticket_display, 'start': event['EVENT_START'],'end': event['EVENT_END'] , 'color': EVENT_COLORS[event['TYPE']], 'url': ticket_url })
+                event_url = args['_trac_url'] + '/ticket/' +  str(event['EVENT_ID']) 
+                _json_array.append({'title':  ticket_display, 'start': event['EVENT_START'],'end': event['EVENT_END'] , 'color': EVENT_COLORS[event['TYPE']], 'url': event_url })
+            elif event['TYPE'] == 'TICKET_CLOSED':
+                ''' Show tickets closed Total ticket time Open -> Closed '''
+                #self.env.log.debug("TICKET %s" %(event))
+                ticket_display = '#' + str(event['EVENT_ID']) + ' ' + event['TITLE']
+                event_url = args['_trac_url'] + '/ticket/' +  str(event['EVENT_ID']) 
+                _json_array.append({'title':  ticket_display, 'start': event['EVENT_START'],'end': event['EVENT_END'] , 'color': EVENT_COLORS[event['TYPE']], 'url': event_url })
+            elif event['TYPE'] == 'MILESTONE_CLOSED':
+                ''' Show milestoned closed '''
+                #self.env.log.debug("TICKET %s" %(event))
+                ticket_display = '#' + str(event['EVENT_ID']) + ' ' + event['TITLE']
+                event_url = args['_trac_url'] + '/milestone/' +  event['TITLE'] 
+                _json_array.append({'title':  event['TITLE'], 'start': event['EVENT_START'],'end': event['EVENT_END'] , 'color': EVENT_COLORS[event['TYPE']], 'url': event_url })
+            elif event['TYPE'] == 'TICKET_MILESTONE':
+                ''' Show Milestone based on ticket status '''
+                #self.env.log.debug("TICKET %s" %(event))
+                event_display = '#' + str(event['EVENT_ID']) + ' ' + event['MILESTONE_NAME']
+                event_url = args['_trac_url'] + '/milestone/' +  event['MILESTONE_NAME'] 
+                _json_array.append({'title':  event_display, 'start': event['EVENT_START'],'end': event['EVENT_END'] , 'color': EVENT_COLORS[event['TYPE']], 'url': event_url })
             
         json_feed = json.dumps(_json_array)
-        self.env.log.debug("JSON DATA %s" %(_json_array))
+        #self.env.log.debug("JSON DATA %s" %(_json_array))
         return json_feed
 
 

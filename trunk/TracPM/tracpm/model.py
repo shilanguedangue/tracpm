@@ -98,7 +98,7 @@ class EventData(object):
                   WHERE
                     completed = 0
                     and
-                    CAST (substr(due, 1,10 ) as INT) 
+                    CAST(substr(due, 1,10 ) as signed) 
                   BETWEEN
                    %(START)s and %(END)s
                   ''' 
@@ -119,7 +119,7 @@ class EventData(object):
                   WHERE
                   status != 'closed'
                   AND
-                    CAST(substr(time, 1,10 ) as INT) 
+                    CAST(substr(time, 1,10 ) as signed) 
                   BETWEEN
                    %(START)s and %(END)s
                   ''' 
@@ -137,7 +137,7 @@ class EventData(object):
                   FROM
                   revision
                   WHERE
-                    CAST(substr(time, 1,10 ) as INT) 
+                    CAST(substr(time, 1,10 ) as signed) 
                   BETWEEN
                    %(START)s and %(END)s
                   '''  
@@ -159,7 +159,7 @@ class EventData(object):
                   FROM
                   milestone
                   WHERE
-                    CAST(substr(completed, 1,10 ) as INT) 
+                    CAST(substr(completed, 1,10 ) as signed) 
                   BETWEEN
                    %(START)s and %(END)s
                   '''
@@ -179,7 +179,7 @@ class EventData(object):
                   WHERE
                   status = 'closed'
                   and 
-                    CAST(substr(changetime, 1,10 ) as INT) 
+                    CAST(substr(changetime, 1,10 ) as signed) 
                   BETWEEN
                    %(START)s and %(END)s
                   ''' 
@@ -198,7 +198,7 @@ class EventData(object):
                   FROM
                   ticket
                   WHERE
-                    CAST(substr(changetime, 1,10 ) as INT) 
+                    CAST(substr(changetime, 1,10 ) as signed) 
                   BETWEEN
                    %(START)s and %(END)s
                    '''
@@ -219,7 +219,7 @@ class EventData(object):
                   WHERE
                   field = 'status'
                   and 
-                    CAST(substr(changetime, 1,10 ) as INT) 
+                    CAST(substr(changetime, 1,10 ) as signed) 
                   BETWEEN
                    %(START)s and %(END)s
                   ''' 

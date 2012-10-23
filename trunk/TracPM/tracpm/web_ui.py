@@ -137,8 +137,8 @@ class PmPlugin(Component):
         parsed = {}
         string = req.query_string
         info = req.path_info
-        self.log.debug("Parsing Path  => [ %s ] string [ %s ]" % (info , string ))
-        self.log.debug("Parsing Path  => [ %s ]" % req)
+        #self.log.debug("Parsing Path  => [ %s ] string [ %s ]" % (info , string ))
+        #self.log.debug("Parsing Path  => [ %s ]" % req)
         path_str = str(req.path_info)
         path_parts = path_str.split('/')
         
@@ -150,7 +150,7 @@ class PmPlugin(Component):
         '''
         path_parts = [part.lower() for part in path_parts]
         ''' First element is based on matching rule so skip it'''
-        self.log.debug("Here is the array of items parsed  => [ %s ]" % path_parts)
+        #self.log.debug("Here is the array of items parsed  => [ %s ]" % path_parts)
         if (len(path_parts) >= 2):
             parsed['route'] = path_parts[1]
             if (len(path_parts) >= 3):
@@ -161,7 +161,7 @@ class PmPlugin(Component):
         else: 
             parsed['route'] = 'error'
        
-        self.log.debug("Returning this parsed list  => [ %s ]" % parsed)
+        #self.log.debug("Returning this parsed list  => [ %s ]" % parsed)
         return parsed
         
     def process_request(self, req):
@@ -187,13 +187,13 @@ class PmPlugin(Component):
 
         add_javascript(req, 'ht/js/pm.js')
         
-        self.log.debug("--> Got this request: %s and %s" % (req, req.args))
+        #self.log.debug("--> Got this request: %s and %s" % (req, req.args))
         
         if (req.args.has_key('areq')):
             '''
             Process AJAX request
             '''    
-            self.log.debug("Processing AJAX Request %s" %(req.args['areq']) )    
+            #self.log.debug("Processing AJAX Request %s" %(req.args['areq']) )    
             if (req.args['areq'] == 'pm_cal_req'):
                 ''' '''    
                 

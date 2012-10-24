@@ -17,7 +17,7 @@ from setuptools import setup
 
 setup(
     name='TracPM',
-    version='0.3.2',
+    version='0.3.3',
     packages=['tracpm'],
     author='Kevin Fox',
     description='Project Planning / scheduling / charting....',

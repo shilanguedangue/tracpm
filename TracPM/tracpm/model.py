@@ -92,7 +92,7 @@ class EventData(object):
                   name             as D,
                   'NULL'             as E,
                   substr(due,1,10)   as F,
-                  substr(completed,1,10) as G
+                  substr(due + 300000000,1,10)   as G
                   FROM
                   milestone
                   WHERE
@@ -100,7 +100,7 @@ class EventData(object):
                     and
                     CAST(substr(due, 1,10 ) as signed) 
                   BETWEEN
-                   %(START)s and %(END)s
+                   %(START)s and %(END)s + 300
                   ''' 
                     sql_list.append(sql_string)
                     
@@ -113,7 +113,7 @@ class EventData(object):
                   summary            as D,
                   status             as E,
                   substr(time,1,10)   as F,
-                  substr(changetime,1,10) as G
+                  substr(time + 300000000,1,10)   as G
                   FROM
                   ticket
                   WHERE
@@ -154,8 +154,8 @@ class EventData(object):
                   'NULL'               as C,
                   name             as D,
                   'NULL'             as E,
-                  substr(due,1,10)   as F,
-                  substr(completed,1,10) as G
+                  substr(completed,1,10) as F,
+                  substr(completed + 300000000,1,10) as G
                   FROM
                   milestone
                   WHERE
@@ -172,8 +172,8 @@ class EventData(object):
                   milestone          as C,
                   summary            as D,
                   status             as E,
-                  substr(time,1,10)   as F,
-                  substr(changetime,1,10) as G
+                  substr(changetime,1,10) as F,
+                  substr(changetime + 300000000,1,10) as G
                   FROM
                   ticket
                   WHERE
@@ -194,7 +194,7 @@ class EventData(object):
                   summary            as D,
                   status             as E,
                   substr(time,1,10)   as F,
-                  substr(changetime,1,10) as G
+                  substr(time + 300000000,1,10)   as G
                   FROM
                   ticket
                   WHERE

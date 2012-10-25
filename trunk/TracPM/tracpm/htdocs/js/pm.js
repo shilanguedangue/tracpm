@@ -54,7 +54,7 @@ $(document).ready(function() {
         		},
         		error: function() {
                      alert('there was an error while fetching events!');
-                 },
+                 }
         	});  	
         }
         

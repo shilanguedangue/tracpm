@@ -9,7 +9,7 @@ from trac.env import IEnvironmentSetupParticipant
 __all__ = ['PMSetup']
 
 # Database version identifier for upgrades.
-db_version = 4
+db_version = 5
 
 
 schema = [
@@ -17,10 +17,12 @@ schema = [
         Column('id', type='int', auto_increment=True),
         Column('event_name', type='text'),
         Column('event_description', type='text'),
-        Column('creator', type='text', size=200),
+        Column('event_type', type='text', size=64),
+        Column('creator', type='text', size=64),
+        Column('event_ts', type='int'),
         Column('create_ts', type='int'),
         Column('update_ts', type='int'),
-        Index(['update_ts'])                      
+        Index(['event_ts'])                      
     ],                                                
 ] 
 

@@ -8,6 +8,27 @@
     <title>Calendar View</title>
 </head>
 <body>
+
+
+<div id='createEventDialog' title='Create Event' >
+	<p class="validation-msg">Please complete all fields.</p>
+	<form>
+	<label for='eventName'></label>
+	<input type='text' name='eventName' id='eventNameId'/>
+	<label for='eventDesc'></label>
+	<input type='text' name='eventDesc' id='eventDescId'/>
+	<label for='eventType'></label>
+	<input type='text' name='eventType' id='eventTypeId'/>
+	<label for='eventDate'></label>
+	<input type='text' name='eventDate' id='eventDateId'/>
+	
+	<input type='hidden' name='eventCreator' id='eventCreatorId'/>
+
+	</form>
+
+</div>
+
+
 <div id="content" class="pm-content">
  <h1>Plan Manager</h1>  
 	<div class='pm-main'>
@@ -75,6 +96,7 @@
 		 	 </fieldset>
 		 	 <div>
 		 	 	<input type='button' name='pb-cal-updateBtn' value='Update Calendar' id='pm-cal-submit'></input>
+		 	 	<input type='button' name='pb-cal-eventBtn' value='Add Event' id='pm-cal-event'></input>
 		 	 </div>
 	 	 </form>
 	</div>

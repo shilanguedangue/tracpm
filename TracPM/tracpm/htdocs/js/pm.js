@@ -6,10 +6,32 @@ $('#pm-cal-submit').live('click', function() {
 	$('#pm-cal').fullCalendar( 'refetchEvents' );
 });
 
+$('#pm-cal-event').live('click', function(){
+	//alert('event btn pressed');
+	$('#createEventDialog').dialog('open');
+});
+
+
 
 $(document).ready(function() {
     //Load Base Calendar      
 	    
+	$('#createEventDialog').dialog({
+		autoOpen: false,
+		height: 400,
+		width: 300,
+		modal: true,
+		//buttons: {		}
+		close: function() {
+			allFields.val( "" ).removeClass( "ui-state-error" );
+		}
+		
+	});
+
+	
+
+	
+	
 	
 	$('#pm-cal').fullCalendar({
     	header: {

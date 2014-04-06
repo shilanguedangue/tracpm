@@ -100,7 +100,7 @@ class EventData(object):
                     and
                     CAST(substr(due, 1,10 ) as signed) 
                   BETWEEN
-                   %(START)s and %(END)s + 300
+                   {0} and {1} + 300
                   ''' 
                     sql_list.append(sql_string)
                     
@@ -121,7 +121,7 @@ class EventData(object):
                   AND
                     CAST(substr(time, 1,10 ) as signed) 
                   BETWEEN
-                   %(START)s and %(END)s
+                   {0} and {1}
                   ''' 
                     sql_list.append(sql_string)
                 elif (item == 'changeset') :
@@ -139,7 +139,7 @@ class EventData(object):
                   WHERE
                     CAST(substr(time, 1,10 ) as signed) 
                   BETWEEN
-                   %(START)s and %(END)s
+                   {0} and {1}
                   '''  
                     sql_list.append(sql_string)
      
@@ -161,7 +161,7 @@ class EventData(object):
                   WHERE
                     CAST(substr(completed, 1,10 ) as signed) 
                   BETWEEN
-                   %(START)s and %(END)s
+                   {0} and {1}
                   '''
                     sql_list.append(sql_string) 
                 elif (item == 'ticket_closed') :
@@ -181,7 +181,7 @@ class EventData(object):
                   and 
                     CAST(substr(changetime, 1,10 ) as signed) 
                   BETWEEN
-                   %(START)s and %(END)s
+                   {0} and {1}
                   ''' 
                     sql_list.append(sql_string) 
                 elif (item == 'ticket_milestone') :
@@ -200,7 +200,7 @@ class EventData(object):
                   WHERE
                     CAST(substr(changetime, 1,10 ) as signed) 
                   BETWEEN
-                   %(START)s and %(END)s
+                   {0} and {1}
                    '''
                     sql_list.append(sql_string) 
                 elif (item == 'ticket_workflow') :
@@ -221,7 +221,7 @@ class EventData(object):
                   and 
                     CAST(substr(changetime, 1,10 ) as signed) 
                   BETWEEN
-                   %(START)s and %(END)s
+                   {0} and {1}
                   ''' 
                     sql_list.append(sql_string)
                 elif (item == 'ticket_due') :
@@ -233,8 +233,8 @@ class EventData(object):
                   t.milestone                  as C, -- MILESTONE_NAME
                   t.summary                    as D, -- TITLE
                   t.status                   as E, -- STATUS
-                  strftime('%s', tc.value)          as F,          -- EVENT_START
-                  strftime('%s', tc.value) + 3000000    as G  -- EVENT_END
+                  strftime('%s', tc.value) +15000         as F,          -- EVENT_START (Pad for strftime calc)
+                  strftime('%s', tc.value) +16000 as G  -- EVENT_END
                   FROM
                   ticket t
                   inner join ticket_custom tc on (
@@ -247,12 +247,13 @@ class EventData(object):
                   WHERE
                     CAST(strftime('%s',tc.value) as signed) 
                   BETWEEN
-                   %(START)s and %(END)s
+                   {0} and {1}
                   ''' 
                     sql_list.append(sql_string)
         sql = ' UNION '.join(sql_list)      
         
-        sql = sql % ( timeframe )
+        
+        sql = sql.format(timeframe['START'], timeframe['END'])
         self.env.log.debug("- SQL -  %s" %(sql))
         columns = ['TYPE', 'EVENT_ID', 'MILESTONE_NAME', 'TITLE', 'STATUS', 'EVENT_START', 'EVENT_END']
         cursor = self.db.cursor()
@@ -261,7 +262,7 @@ class EventData(object):
         EVENT_COLORS = {
         'MILESTONE': 'red',
         'TICKET' : 'green',
-        'TICKET_DUE': 'yellow',
+        'TICKET_DUE': '#8A4B08',
         'MILESTONE_CLOSED': 'black',
         'TICKET_CLOSED': 'grey',
         'TICKET_MILESTONE': 'blue'
@@ -304,10 +305,10 @@ class EventData(object):
                 event_url = args['_trac_url'] + '/milestone/' +  event['MILESTONE_NAME'] 
                 _json_array.append({'title':  event_display, 'start': event['EVENT_START'],'end': event['EVENT_END'] , 'color': EVENT_COLORS[event['TYPE']], 'url': event_url })
             elif event['TYPE'] == 'TICKET_DUE':
-                ''' Show Milestone based on ticket status '''
+                ''' Show milestone event '''
                 #self.env.log.debug("TICKET %s" %(event))
-                event_display = '#' + str(event['EVENT_ID']) + ' ' + event['TITLE']
-                event_url = args['_trac_url'] + '/ticket/' +  event['EVENT_ID'] 
+                ticket_display = '#' + str(event['EVENT_ID']) + ' ' + event['TITLE']
+                event_url = args['_trac_url'] + '/ticket/' +  str(event['EVENT_ID']) 
                 _json_array.append({'title':  ticket_display, 'start': event['EVENT_START'],'end': event['EVENT_END'] , 'color': EVENT_COLORS[event['TYPE']], 'url': event_url })
         json_feed = json.dumps(_json_array)
         #self.env.log.debug("JSON DATA %s" %(_json_array))

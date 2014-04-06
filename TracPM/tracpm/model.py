@@ -224,11 +224,36 @@ class EventData(object):
                    %(START)s and %(END)s
                   ''' 
                     sql_list.append(sql_string)
-     
+                elif (item == 'ticket_due') :
+                    # Show ticket by due date 
+                    sql_string = '''
+                  SELECT  
+                  'TICKET_DUE'               as A, -- Type
+                  t.id                     as B,     -- EVENT_ID
+                  t.milestone                  as C, -- MILESTONE_NAME
+                  t.summary                    as D, -- TITLE
+                  t.status                   as E, -- STATUS
+                  strftime('%s', tc.value)          as F,          -- EVENT_START
+                  strftime('%s', tc.value) + 3000000    as G  -- EVENT_END
+                  FROM
+                  ticket t
+                  inner join ticket_custom tc on (
+                    t.id = tc.ticket
+                    and
+                    tc.name = 'due_date'
+                    and 
+                    tc.value != ''
+                  ) 
+                  WHERE
+                    CAST(strftime('%s',tc.value) as signed) 
+                  BETWEEN
+                   %(START)s and %(END)s
+                  ''' 
+                    sql_list.append(sql_string)
         sql = ' UNION '.join(sql_list)      
         
         sql = sql % ( timeframe )
-        #self.env.log.debug("- SQL -  %s" %(sql))
+        self.env.log.debug("- SQL -  %s" %(sql))
         columns = ['TYPE', 'EVENT_ID', 'MILESTONE_NAME', 'TITLE', 'STATUS', 'EVENT_START', 'EVENT_END']
         cursor = self.db.cursor()
         
@@ -236,7 +261,7 @@ class EventData(object):
         EVENT_COLORS = {
         'MILESTONE': 'red',
         'TICKET' : 'green',
-        'CHANGESET': 'yellow',
+        'TICKET_DUE': 'yellow',
         'MILESTONE_CLOSED': 'black',
         'TICKET_CLOSED': 'grey',
         'TICKET_MILESTONE': 'blue'
@@ -278,7 +303,12 @@ class EventData(object):
                 event_display = '#' + str(event['EVENT_ID']) + ' ' + event['MILESTONE_NAME']
                 event_url = args['_trac_url'] + '/milestone/' +  event['MILESTONE_NAME'] 
                 _json_array.append({'title':  event_display, 'start': event['EVENT_START'],'end': event['EVENT_END'] , 'color': EVENT_COLORS[event['TYPE']], 'url': event_url })
-            
+            elif event['TYPE'] == 'TICKET_DUE':
+                ''' Show Milestone based on ticket status '''
+                #self.env.log.debug("TICKET %s" %(event))
+                event_display = '#' + str(event['EVENT_ID']) + ' ' + event['TITLE']
+                event_url = args['_trac_url'] + '/ticket/' +  event['EVENT_ID'] 
+                _json_array.append({'title':  ticket_display, 'start': event['EVENT_START'],'end': event['EVENT_END'] , 'color': EVENT_COLORS[event['TYPE']], 'url': event_url })
         json_feed = json.dumps(_json_array)
         #self.env.log.debug("JSON DATA %s" %(_json_array))
         return json_feed
@@ -320,6 +350,31 @@ substr(time, 1, 10) as last_update
 FROM ticket_change 
 where field = 'status') 
 order by   milestone_name,  last_update desc
+
+
+
+                  SELECT  
+                  'TICKET_DUE'               as A, -- Type
+                  t.id                     as B,     -- EVENT_ID
+                  t.milestone                  as C, -- MILESTONE_NAME
+                  t.summary                    as D, -- TITLE
+                  t.status                   as E, -- STATUS
+                  strftime('%s', tc.value)          as F,          -- EVENT_START
+                  strftime('%s', tc.value) + 3000000    as G  -- EVENT_END
+                  FROM
+                  ticket t
+                  inner join ticket_custom tc on (
+                    t.id = tc.ticket
+                    and
+                    tc.name = 'due_date'
+                    and 
+                    tc.value != ''
+                  ) 
+                  WHERE
+                    CAST(strftime('%s',tc.value) as signed) 
+                  BETWEEN
+                   1396152000 and 1399780800
+
 
 
 '''

@@ -1,0 +1,1 @@
+Simple Calendar / Gantt interface for Trac. View Trac Milestones, tickets, and events in calendar format. Plan work, verify tasks are completed on-time
